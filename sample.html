@@ -1,0 +1,221 @@
+<html>
+  <head>
+    <!-- Ensure proper scaling on all devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    
+      .mic-listening {
+        animation: pulse 1s infinite;
+        background-color: red;
+      }
+    
+      /* Fade-in transition for the message input section */
+      .message-section {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .message-section.active {
+        display: flex;
+        opacity: 1;
+      }
+    
+      /* Custom chat message styles */
+      .chat-message {
+        padding: 12px 20px;
+        border-radius: 20px;
+        max-width: 80%;
+        word-wrap: break-word;
+        margin-bottom: 15px;
+        font-size: 1rem;
+        line-height: 1.5;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    
+      /* User's message */
+      .chat-message.user {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.7), rgba(30, 64, 175, 0.7));  /* Transparent gradient */
+        color: white;
+        margin-left: auto;
+        text-align: right;
+        font-weight: bold;
+        max-width: 75%;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        border-bottom-left-radius: 20px;
+        padding: 12px 20px;
+        word-wrap: break-word;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+    
+      /* Bot's message */
+      .chat-message.bot {
+        background: linear-gradient(135deg, #4b5563, #2d3748);
+        color: white;
+        margin-right: auto;
+        text-align: left;
+        font-weight: normal;
+        max-width: 75%;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 20px;
+      }
+    
+      /* Control buttons container */
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        z-index: 2;
+      }
+    
+      /* Input button */
+      .message-section input {
+        padding: 12px 18px;
+        background-color: #333;
+        border-radius: 25px;
+        font-size: 1rem;
+        color: white;
+        width: 100%;
+        border: none;
+        transition: background-color 0.3s ease;
+      }
+    
+      /* Placeholder text color */
+      .message-section input::placeholder {
+        color: #a1a1a1;
+      }
+    
+      .message-section input:focus {
+        background-color: #444;
+        outline: none;
+      }
+    
+      .message-section button {
+        background-color: #3b82f6;
+        border-radius: 50%;
+        height: 50px;
+        width: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        z-index: 2;
+      }
+    
+      .message-section button:hover {
+        background-color: #1e40af;
+      }
+    
+      /* Image section behind the chat */
+      .image-background {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.5;
+        z-index: -1;  /* Place the image behind */
+        pointer-events: none;  /* Disable interaction with the image */
+        max-width: 100%;
+        height: auto;
+      }
+    
+      /* Chat content section above the image */
+      #message-content {
+        z-index: 1;  /* Make sure chat content is above the image */
+      }
+    </style>
+    
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center relative p-4">
+    <!-- Main Chat Container -->
+    <div class="w-full max-w-md bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col h-[90vh] overflow-hidden">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold">
+          वेदा : trixs
+          <span class="block text-sm">AI Business Assistant</span>
+        </h1>        
+        <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-500 rounded-full flex items-center justify-center">
+          <img src="https://i.postimg.cc/cHnZVy3s/finle-logo.png" alt="Logo" class="w-full h-full object-contain">
+        </div>
+        
+      </div>
+      <!-- <h5 class="text-0.5xl">AI Business Assistant</h5> -->
+      <!-- Chat Content -->
+      <div
+        class="flex flex-col space-y-4 flex-grow overflow-y-auto pr-2 pb-4"
+        id="message-content"
+      >
+        <!-- Dynamic chat messages will be inserted here -->
+      </div>
+      
+      <!-- Branding / Image -->
+      <div class="flex justify-center items-center mt-4">
+        <img
+            alt="AI-BASED DATABASE AGENT"
+            src="https://i.postimg.cc/9QbJzQ4g/host.jpg"
+            width="300"
+            height="200"
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50 pointer-events-none max-w-full h-auto object-contain"
+        />
+      </div>
+      <link rel="icon" href="/home/petpooja-1025/Documents/project/database-Agent/templates/favicon.ico" type="image/x-icon">
+      <!-- Control Buttons inside the main container -->
+      <div class="btn-container mt-4" id="btn-container">
+        <button
+          id="keyboard-btn"
+          class="w-16 h-16 bg-blue-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors"
+          aria-label="Keyboard input"
+        >
+          <i class="fas fa-keyboard text-white text-2xl"></i>
+        </button>
+        <button
+          id="mic-btn"
+          class="w-16 h-16 bg-gray-700 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors"
+          aria-label="Voice input"
+        >
+          <i class="fas fa-microphone text-white text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Message Input Section -->
+      <div class="flex items-center mt-4 message-section" id="message-section">
+        <input
+          id="message-input"
+          type="text"
+          placeholder="Type your message..."
+          style="border: 2px solid white;"
+        />
+        <button
+          id="send-btn"
+          class="w-16 h-16 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed;"
+          disabled
+        >
+          <i class="fas fa-paper-plane text-white text-2xl"></i>
+        </button>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
